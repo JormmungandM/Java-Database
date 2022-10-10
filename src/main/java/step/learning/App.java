@@ -48,7 +48,7 @@ public class App {
                     + " )";
             try {
                 Statement statement = connection.createStatement();
-                statement.executeUpdate(sql);  // вариант без возврата данных
+                statement.executeUpdate(sql);  // option without data return
                 statement.executeUpdate(insertSql);
                 System.out.println("Query OK");
             } catch (SQLException e) {
