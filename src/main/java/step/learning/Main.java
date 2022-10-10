@@ -7,7 +7,7 @@ public class Main {
         try( ConfigModule configModule = new ConfigModule() ) {
             Guice
                     .createInjector( configModule )
-                    .getInstance( App.class )
+                    .getInstance( AppUser.class )
                     .run() ;
         }
         catch( Exception ex ) {
