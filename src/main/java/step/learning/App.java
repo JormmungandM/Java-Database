@@ -31,30 +31,30 @@ public class App {
             }
 
             // region Home INSERT
-            Random rnd = new Random() ;
-            int rndID = rnd.nextInt(555) ;
-            int rndNum = rnd.nextInt(777) ;
-            String rndStr = String.valueOf(rnd.nextInt(999));
-
-            String sql = "CREATE TABLE IF NOT EXISTS randoms ( " +
-                    "id BIGINT PRIMARY KEY," +
-                    "num INT NOT NULL," +
-                    "str VARCHAR(64) NULL" +
-                    ") Engine=InnoDB DEFAULT CHARSET = UTF8";
-            String insertSql ="INSERT INTO randoms VALUES ( "
-                    + rndID + ","
-                    + rndNum + ","
-                    + rndStr
-                    + " )";
-            try {
-                Statement statement = connection.createStatement();
-                statement.executeUpdate(sql);  // option without data return
-                statement.executeUpdate(insertSql);
-                System.out.println("Query OK");
-            } catch (SQLException e) {
-                System.out.println("DB connection error! "+ e.getMessage());
-                return;
-            }
+//            Random rnd = new Random() ;
+//            int rndID = rnd.nextInt(555) ;
+//            int rndNum = rnd.nextInt(777) ;
+//            String rndStr = String.valueOf(rnd.nextInt(999));
+//
+//            String sql = "CREATE TABLE IF NOT EXISTS randoms ( " +
+//                    "id BIGINT PRIMARY KEY," +
+//                    "num INT NOT NULL," +
+//                    "str VARCHAR(64) NULL" +
+//                    ") Engine=InnoDB DEFAULT CHARSET = UTF8";
+//            String insertSql ="INSERT INTO randoms VALUES ( "
+//                    + rndID + ","
+//                    + rndNum + ","
+//                    + rndStr
+//                    + " )";
+//            try {
+//                Statement statement = connection.createStatement();
+//                statement.executeUpdate(sql);  // option without data return
+//                statement.executeUpdate(insertSql);
+//                System.out.println("Query OK");
+//            } catch (SQLException e) {
+//                System.out.println("DB connection error! "+ e.getMessage());
+//                return;
+//            }
             // endregion
 
             // Command Execution: Separate Methods for Return and Non-Return Commands
@@ -151,6 +151,10 @@ public class App {
 //                return ;
 //            }
             // endregion
+
+
+
+
 
 
             try {
