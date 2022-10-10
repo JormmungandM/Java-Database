@@ -7,6 +7,8 @@ import java.sql.*;
 import java.util.Random;
 
 public class App {
+
+
         public void run() {
             // Registering a driver for MySQL database
             Driver mysqlDriver ;
@@ -30,6 +32,21 @@ public class App {
                 return ;
             }
 
+            //classwork(connection);
+
+            createTable(connection);
+            addToTable(connection);
+            showTable(connection);
+
+
+            // closing connection
+            try {
+                connection.close() ;
+                DriverManager.deregisterDriver( mysqlDriver ) ;
+            } catch( SQLException ignored ) {}
+        }
+
+        private void classwork(Connection connection){
             // region Home INSERT
 //            Random rnd = new Random() ;
 //            int rndID = rnd.nextInt(555) ;
@@ -151,15 +168,67 @@ public class App {
 //                return ;
 //            }
             // endregion
+        }
 
-
-
-
-
-
+        // Create
+        private void createTable(Connection connection){
+            String createSql = "CREATE TABLE IF NOT EXISTS randoms2 ( " +
+                    "id BINARY(36) PRIMARY KEY," +                              // column for  UUID
+                    "numint INT NOT NULL," +                                    // column for  int
+                    "numfloat float NOT NULL," +                                // column for  float
+                    "str VARCHAR(64) NOT NULL," +                               // column for  str
+                    "datatime date NOT NULL" +                                  // column for  date
+                    " ) Engine=InnoDB DEFAULT CHARSET = UTF8";
             try {
-                connection.close() ;
-                DriverManager.deregisterDriver( mysqlDriver ) ;
-            } catch( SQLException ignored ) {}
+                // Update table
+                Statement statement = connection.createStatement();
+                statement.executeUpdate(createSql);
+            } catch (SQLException ex) {
+                System.out.println("DB connection error! "+ ex.getMessage());
+                System.out.println(createSql);
+                return;
+            }
+        }
+
+        // Add
+        private void addToTable(Connection connection){
+            Random rand = new Random();
+            String rndStr = "Str";
+            Date date= new Date(new java.util.Date().getTime());                    // date creation
+            String sql = "INSERT INTO randoms2 VALUES (UUID(), ?, ?, ?, ?)";        // creating a request
+            try (PreparedStatement prep = connection.prepareStatement(sql)){
+                for( int i = 0; i < 5; i++ ){
+                    prep.setInt( 1, i + rand.nextInt() );                    // int creation
+                    prep.setFloat( 2, rand.nextFloat() );                      // float creation
+                    prep.setString( 3,rndStr + ( i + rand.nextInt() ) );     // string creation
+                    prep.setDate( 4, date );                                   // set date
+                    prep.executeUpdate();                                                   // Table update
+                }
+
+            } catch (SQLException ex) {
+                System.out.println("addToTable error. " + ex.getMessage());
+            }
+        }
+
+        // Show
+        private void showTable(Connection connection){
+
+            String sql = "SELECT * FROM randoms2" ;     // creating a request for all data
+            try( Statement statement = connection.createStatement() ;
+                 ResultSet res = statement.executeQuery( sql ) ) {
+                while( res.next() ) {
+                    System.out.printf("%s -> int: %d \t float: %f \t string: %s \t data: %s %n",    // show all data line
+                                    res.getString(1),
+                                    res.getInt(2),
+                                    res.getFloat(3),
+                                    res.getString("str"),
+                                    res.getDate(5) );
+                }
+            }
+            catch( SQLException ex ) {
+                System.out.println( "Query error: " + ex.getMessage() ) ;
+                System.out.println( sql ) ;
+                return ;
+            }
         }
 }

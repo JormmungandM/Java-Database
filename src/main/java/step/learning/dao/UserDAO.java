@@ -23,9 +23,9 @@ public class UserDAO {
      * @return `id` of new record or null if fails
      */
     public String add( User user ) {
-        // генерируем id для новой записи
+        // generate id for new post
         String id = UUID.randomUUID().toString() ;
-        // готовим запрос (подстановка введенных данных!!)
+        // preparing a request (substituting the entered data)
         String sql = "INSERT INTO Users(`id`,`login`,`pass`,`name`) VALUES(?,?,?,?)" ;
         try( PreparedStatement prep = connection.prepareStatement( sql ) ) {
             prep.setString( 1, id ) ;
