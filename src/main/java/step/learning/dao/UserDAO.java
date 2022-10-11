@@ -28,13 +28,18 @@ public class UserDAO {
     public String add( User user ) {
         // generate id for new post
         String id = UUID.randomUUID().toString() ;
+        // generate salt
+        String salt = hashService.hash( UUID.randomUUID().toString() );
+        // generate hash password
+        String passHash = this.hashPassword( user.getPass(), salt );
         // preparing a request (substituting the entered data)
-        String sql = "INSERT INTO Users(`id`,`login`,`pass`,`name`) VALUES(?,?,?,?)" ;
+        String sql = "INSERT INTO Users( id, login, pass, name, salt ) VALUES(?,?,?,?,?)" ;
         try( PreparedStatement prep = connection.prepareStatement( sql ) ) {
             prep.setString( 1, id ) ;
             prep.setString( 2, user.getLogin() ) ;
-            prep.setString( 3, user.getPass()  ) ;
+            prep.setString( 3, passHash  ) ;
             prep.setString( 4, user.getName()  ) ;
+            prep.setString( 5, salt  ) ;
             prep.executeUpdate() ;
         }
         catch( SQLException ex ) {
@@ -50,7 +55,7 @@ public class UserDAO {
      * @return  true if login is in table
      */
     public boolean isLoginUsed(String login){
-        String sql = "SELECT COUNT(u.id) FROM users u WHERE u.`login`=?";
+        String sql = "SELECT COUNT(u.id) FROM users u WHERE u.login=?";
 
         try ( PreparedStatement prep = connection.prepareStatement(sql))
         {
@@ -71,13 +76,48 @@ public class UserDAO {
      * @param password Open password string
      * @return  hash for DB table
      */
-    public String hashPassword(String password){
-        String salt = "";
-        return hashService.hash(password+salt);
+    public String hashPassword(String password, String salt){
+        return hashService.hash( salt + password + salt  );
     }
 
-    public User getUserByCredentials(String login, String password){
+    public User getUserByCredentials(String login, String password) {
+        String sql = "SELECT u.* FROM users u WHERE u.login=?";
+
+        try ( PreparedStatement prep = connection.prepareStatement( sql ) ) {
+            prep.setString(1, login );
+            ResultSet res = prep.executeQuery();
+            if(res.next()) {
+                User user = new User(res);
+                // password - open password, user.pass - hash(password,user.salt)
+                String expectedHash = this.hashPassword( password,user.getSalt());
+                if( expectedHash.equals(user.getPass())){
+                    return user;
+                }
+            }
+
+        }
+        catch (SQLException ex) {
+            System.out.println("DB connection error! " + ex.getMessage());
+            System.out.println(sql);
+        }
         return null;
     }
 
+
+    public User getUserByCredentialsOld(String login, String password) {
+        String sql = "SELECT u.* FROM users u WHERE u.login=? AND u.pass=?";
+
+        try ( PreparedStatement prep = connection.prepareStatement( sql ) ) {
+            prep.setString(1, login );
+            prep.setString(2,  password );
+            ResultSet res = prep.executeQuery();
+            if(res.next()) return new User(res);
+
+        }
+        catch (SQLException ex) {
+            System.out.println("DB connection error! " + ex.getMessage());
+            System.out.println(sql);
+        }
+        return null;
+    }
 }

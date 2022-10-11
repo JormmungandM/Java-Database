@@ -1,10 +1,26 @@
 package step.learning.entities;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class User {
     private String id;
     private String login;
     private String pass;
     private String name;
+
+    private String salt;
+
+    public User(){
+
+    }
+    public User(ResultSet res) throws SQLException {
+        id      = res.getString("id" );
+        login   = res.getString("login" );
+        pass    = res.getString("pass" );
+        name    = res.getString("name" );
+        salt    = res.getString("salt");
+    }
 
     public String getId() {
         return id;
@@ -36,6 +52,13 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setSalt(String salt){
+        this.salt = salt;
+    }
+    public String getSalt(){
+        return salt;
     }
 
 }

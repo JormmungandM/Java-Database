@@ -44,12 +44,27 @@ public class AppUser {
         System.out.print("1 - Registration\n2 - Log in\nEnter choice: ");
         int userChoice = kbScanner.nextInt();
 
-        if (userChoice == 1) {
-            if(regUser()) {
-                System.out.println("User created");
-            } else System.out.println("User creation error");
+        switch ( userChoice ) {
+            case 1 -> this.regUser();
+            case 2 -> this.authUser();
         }
 
+    }
+
+    private boolean authUser() {
+
+        Scanner kbScanner = new Scanner( System.in );
+        System.out.print( "Enter login: " );
+        String login = kbScanner.nextLine();
+        System.out.print( "Enter password: " );
+        String password = kbScanner.nextLine();
+        User user = userDAO.getUserByCredentials( login, password );
+        if( user == null ){
+            System.out.println( "ACCESS DENIED" );
+            return false;
+        }
+        System.out.println( "Hello, " + user.getName() );
+        return true;
     }
 
     private boolean regUser() {
@@ -102,9 +117,9 @@ public class AppUser {
 
         //region Create new User
         User user = new User();
-        user.setLogin( login );         // adding login
-        user.setPass( password );       // adding password
-        user.setName( name );           // adding name
+        user.setLogin( login );          // adding login
+        user.setPass ( password );       // adding password
+        user.setName ( name );           // adding name
         //endregion
 
         //region Adding User to db
