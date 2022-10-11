@@ -81,16 +81,23 @@ public class UserDAO {
     }
 
     public User getUserByCredentials(String login, String password) {
-        String sql = "SELECT u.* FROM users u WHERE u.login=?";
+        String sql = "SELECT u.* FROM users u WHERE u.login=?";                 // creating request
 
         try ( PreparedStatement prep = connection.prepareStatement( sql ) ) {
+
             prep.setString(1, login );
             ResultSet res = prep.executeQuery();
+
             if(res.next()) {
                 User user = new User(res);
                 // password - open password, user.pass - hash(password,user.salt)
                 String expectedHash = this.hashPassword( password,user.getSalt());
-                if( expectedHash.equals(user.getPass())){
+                if( expectedHash.equals(user.getPass())){   // checking if password is created with salt
+                    return user;
+                }
+
+                String simpleHash = hashService.hash(password);
+                if(simpleHash.equals(user.getPass())){  // checking if password is created without salt
                     return user;
                 }
             }
