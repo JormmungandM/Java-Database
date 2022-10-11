@@ -1,20 +1,23 @@
 package step.learning.dao;
 
 import step.learning.entities.User;
+import step.learning.services.hash.HashService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.Objects;
 import java.util.UUID;
 
 @Singleton
 public class UserDAO {
     private final Connection connection ;
+    private final HashService hashService;
+
     @Inject
-    public UserDAO( Connection connection ) {
+    public UserDAO( Connection connection,HashService hashService ) {
         this.connection = connection ;
+        this.hashService = hashService;
     }
 
     /**
@@ -40,4 +43,41 @@ public class UserDAO {
         }
         return id ;
     }
+
+    /**
+     * Checks User table for login given
+     * @param login value to look for
+     * @return  true if login is in table
+     */
+    public boolean isLoginUsed(String login){
+        String sql = "SELECT COUNT(u.id) FROM users u WHERE u.`login`=?";
+
+        try ( PreparedStatement prep = connection.prepareStatement(sql))
+        {
+            prep.setString(1, login );
+            ResultSet res = prep.executeQuery();
+            res.next();
+            return  res.getInt(1) > 0;
+
+        } catch (SQLException ex) {
+            System.out.println("DB connection error! "+ ex.getMessage());
+            System.out.println(sql);
+            return true;
+        }
+    }
+
+    /**
+     * Calculates hash (optionally salted) from password
+     * @param password Open password string
+     * @return  hash for DB table
+     */
+    public String hashPassword(String password){
+        String salt = "";
+        return hashService.hash(password+salt);
+    }
+
+    public User getUserByCredentials(String login, String password){
+        return null;
+    }
+
 }
